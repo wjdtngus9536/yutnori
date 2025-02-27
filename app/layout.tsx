@@ -1,20 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Gowun_Dodum } from "next/font/google";
+import { Gowun_Dodum } from "next/font/google";
 import "./globals.css";
 
 const yutnoriFont = Gowun_Dodum({
   weight: '400',
-  
-})
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin"], // 여기에 서브셋 추가
+  preload: true,
 });
 
 export const metadata: Metadata = {

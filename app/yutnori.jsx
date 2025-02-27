@@ -79,7 +79,6 @@ const Board = ({ movablePositions, pieces, onSquareClick }) => {
             y={pos.y - 20}
             width="40"
             height="40"
-            style={{ overflow: 'visible' }}
           >
             <Square
               node={parseInt(node)}
@@ -179,12 +178,16 @@ const YutnoriGame = ({ gameType, playerCount }) => {
           // 승리 여부 확인
           if (game.isWin()) {
             alert(`Player ${game.turn} wins!`);
-            return;
           }
 
           setRollResults(rollResults);
           setSelectedPiece(null);
           setMovablePositions([]);
+
+          console.log(`턴 변경 조건 확인`, rollResults[0], game.rollable_cnt)
+          if (rollResults.length === 0 && game.rollable_cnt === 0) {
+          game.change_turn();
+      }
         }
       }
 

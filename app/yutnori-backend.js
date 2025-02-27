@@ -178,13 +178,18 @@ export class Yutnori {
                     continue;
                 }
             }
-            if (from == 6) {
-                if(neighbor == 28) {
+            if (from === 6) {
+                if(neighbor === 28 || neighbor === 7) {
                     continue;
                 }
             }
-            if (from == 11) {
-                if(neighbor == 24) {
+            if (from === 11) {
+                if(neighbor === 24 || neighbor === 12) {
+                    continue;
+                }
+            }
+            if (from === 23) {
+                if(neighbor === 24) {
                     continue;
                 }
             }
@@ -429,7 +434,7 @@ export class Yutnori {
 
             // let choicedNode = null;
             // 완주를 선택한(-1로 이동) 경우 movePiece를 할 필요도 없음
-            const lapCompletableRollResult = Object.entries(rollResultToNodesMap).find(([_, values]) => values.includes(-1))?.[0];
+            const lapCompletableRollResult = Object.entries(rollResultToNodesMap).find(([_, values]) => values.includes(-1))?.[0]; // eslint-disable-line @typescript-eslint/no-unused-vars
             // 일단 완주가 가능하면 완주를 우선하는 것으로 설정, 나중에 choicedNode를 통해 변경할 것 ★
             
             if (lapCompletableRollResult) {
@@ -462,7 +467,7 @@ export class Yutnori {
 
                 // 선택된 node로 이동할 수 있는 roll_result가 뭔지 알아내서 roll_result_list에서 지우고, rollResultToNodesMap 변수는 while 반복 마다 getMovableMap()함수 내에서 초기화 & 업데이트
                 // entries메서드는 객체를 [[key, values], ...] 형태의 2차원 리스트로 만들고 find 함수는 values에 사용자가 선택한 to가 포함된 [key, values] 배열을 return 여기서 옵셔널 체이닝으로 값이 없는 경우 undefined를 return해서 에러 없도록 처리
-                const selectedRollResult = Object.entries(rollResultToNodesMap).find(([_, values]) => values.includes(to))?.[0];
+                const selectedRollResult = Object.entries(rollResultToNodesMap).find(([_, values]) => values.includes(to))?.[0]; // eslint-disable-line @typescript-eslint/no-unused-vars
                 if (selectedRollResult === undefined) {
                     throw new Error(`이동 불가능한 to를 사용자가 입력`);
                 }
