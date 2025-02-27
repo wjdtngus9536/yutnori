@@ -110,7 +110,7 @@ export class Yutnori {
             { value: 2, weight: 5 },  // 5/16 개
             { value: 3, weight: 4 },  // 4/16 걸
             { value: 4, weight: 1 },  // 1/16 윷
-            { value: 5, weight: 100 },  // 1/16 모
+            { value: 5, weight: 1 },  // 1/16 모
             // { value: -1, weight: 1 }, // 1/16 빽도, 은근히 알고리즘이 복잡해 질 거 같다..
         ];
 

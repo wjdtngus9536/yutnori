@@ -4,7 +4,7 @@ import { toYut } from '../lib/utils';
 import { Yutnori } from './yutnori-backend';
 
 const N0 = '윷승엽';
-const N1 = '윷타니'; 
+const N1 = '윷타니';
 
 // 노드 위치 정보
 const nodePositions = {
@@ -96,7 +96,7 @@ const Board = ({ movablePositions, pieces, onSquareClick }) => {
 };
 
 // YutnoriGame 컴포넌트
-const YutnoriGame = ({gameType, playerCount}) => {
+const YutnoriGame = ({ gameType, playerCount }) => {
   const [game, setGame] = useState(null);
   const [currentRoll, setCurrentRoll] = useState(null);
   const [rollResults, setRollResults] = useState([]);
@@ -113,15 +113,15 @@ const YutnoriGame = ({gameType, playerCount}) => {
   // 윷 던지기 핸들러
   const handleRoll = () => {
     if (!game || game.rollable_cnt < 1) return;
-    
+
     const result = game.roll();
     setCurrentRoll(result);
-    
+
     if (result === 0) {
       game.rollable_cnt -= 1;
       console.log(`낙이 나온 경우 턴 변경 조건 확인`, rollResults[0], game.rollable_cnt)
       if (rollResults.length === 0 && game.rollable_cnt === 0) {
-        console.log(`낙이 나왔고 턴 변경 조건에 부합하는 상황`, rollResults[0], game.rollable_cnt)        
+        console.log(`낙이 나왔고 턴 변경 조건에 부합하는 상황`, rollResults[0], game.rollable_cnt)
         game.change_turn();
         setRollResults([]);
         setSelectedPiece(null);
@@ -129,11 +129,11 @@ const YutnoriGame = ({gameType, playerCount}) => {
       }
       return;
     }
-    
+
     if (result > 3) {
       game.rollable_cnt += 1;
     }
-    
+
     game.rollable_cnt -= 1;
     setRollResults([...rollResults, result]);
   };
@@ -145,24 +145,24 @@ const YutnoriGame = ({gameType, playerCount}) => {
       const from = game.users[game.turn].pieces[pieceIdx];
       const rollResultToNodesMap = game.getMovableMap(from, rollResults);
       console.log(`user${game.turn}의 piece${pieceIdx}이 이동 가능한 node입니다. 선택해주세요.`, rollResultToNodesMap);
-      
+
       // 완주 가능 여부 확인
       const lapCompletableRollResult = Object.entries(rollResultToNodesMap).find(([_, values]) => values.includes(-1))?.[0];
       if (lapCompletableRollResult) {
         const answer = prompt(`완주 하시겠습니까?(input yes)`);
-        if(answer === 'yes') {
+        if (answer === 'yes') {
           console.log('완주를 선택');
           // users 수정...
           let stackedPieceCnt = game.board[from].num_of_pieces; // 보드 정보를 통해 완주가 가능해진 해당 칸에서 말이 몇 마리 겹쳐져 있는지 확인 
           while (stackedPieceCnt) {
-              for (let i = 0; i < game.users[game.turn].pieces.length; i++) {
-                  // users를 통해 각 말의 위치가 현재 위치인지 대조 후
-                  if (game.users[game.turn].pieces[i] == from) {
-                      // 같은 위치에 있는 모든 말들을 완주 처리
-                      game.users[game.turn].pieces[i] = -1;
-                      stackedPieceCnt -= 1;
-                  }
+            for (let i = 0; i < game.users[game.turn].pieces.length; i++) {
+              // users를 통해 각 말의 위치가 현재 위치인지 대조 후
+              if (game.users[game.turn].pieces[i] == from) {
+                // 같은 위치에 있는 모든 말들을 완주 처리
+                game.users[game.turn].pieces[i] = -1;
+                stackedPieceCnt -= 1;
               }
+            }
           }
           // board 수정...
           // 완주한 말은 board 위에도 있을 필요 없으므로 초기화
@@ -170,13 +170,17 @@ const YutnoriGame = ({gameType, playerCount}) => {
           game.board[from].num_of_pieces = 0;
 
           const usedRollIndex = rollResults.indexOf(parseInt(lapCompletableRollResult));
-          if(usedRollIndex === -1) {
+          if (usedRollIndex === -1) {
             throw Error(`handlePieceSelect() 완주처리 중 나온적 없는 윷 결과를 삭제하려고 함 usedRoll = ${usedRoll}`);
           } else {
             rollResults.splice(usedRollIndex, 1);
           }
 
-
+          // 승리 여부 확인
+          if (game.isWin()) {
+            alert(`Player ${game.turn} wins!`);
+            return;
+          }
 
           setRollResults(rollResults);
           setSelectedPiece(null);
@@ -186,7 +190,7 @@ const YutnoriGame = ({gameType, playerCount}) => {
 
       setMovablePositions(Object.values(rollResultToNodesMap).flat());
     }
-    
+
   };
 
   // 말 이동 핸들러
@@ -198,10 +202,10 @@ const YutnoriGame = ({gameType, playerCount}) => {
       console.log(`이동 가능한 위치`, movablePositions);
       return;
     }
-    
+
     const fromPosition = game.users[game.turn].pieces[selectedPiece];
     const rollResultToNodesMap = game.getMovableMap(fromPosition, rollResults);
-    
+
     // 어떤 roll 결과로 이동할 수 있는지 찾기
     const usedRoll = Object.entries(rollResultToNodesMap).find(
       ([_, positions]) => positions.includes(toPosition)
@@ -211,7 +215,7 @@ const YutnoriGame = ({gameType, playerCount}) => {
       console.log(`handleMove() usedRoll 확인`, usedRoll);
       game.movePiece(game.turn, selectedPiece, fromPosition, toPosition, parseInt(usedRoll));
       const usedRollIndex = rollResults.indexOf(parseInt(usedRoll));
-      if(usedRollIndex === -1) {
+      if (usedRollIndex === -1) {
         throw Error(`handleMove() 나온적 없는 윷 결과를 삭제하려고 함 usedRoll = ${usedRoll}`);
       } else {
         rollResults.splice(usedRollIndex, 1);
@@ -219,12 +223,6 @@ const YutnoriGame = ({gameType, playerCount}) => {
       setRollResults(rollResults);
       setSelectedPiece(null);
       setMovablePositions([]);
-      
-      // 승리 여부 확인
-      if (game.isWin()) {
-        alert(`Player ${game.turn + 1} wins!`);
-        return;
-      }
 
       // 왜 turn이 안 바뀔까
       console.log(`턴 변경 조건 확인`, rollResults[0], game.rollable_cnt)
@@ -238,19 +236,19 @@ const YutnoriGame = ({gameType, playerCount}) => {
     <div className="p-4">
       <div className="flex gap-8">
         <div className="flex-1">
-          <Board 
-            movablePositions = {movablePositions}
-            pieces = {game?.users.map(user => user.pieces) || []}
+          <Board
+            movablePositions={movablePositions}
+            pieces={game?.users.map(user => user.pieces) || []}
             onSquareClick={handleMove}
           />
         </div>
-        
+
         <div className="w-64">
           <Card className="p-4">
             <h2 className="text-lg font-bold mb-4">
-              {game?.turn?N1:N0} 차례올시다.
+              {game?.turn ? N1 : N0} 차례올시다.
             </h2>
-            
+
             <button
               className="w-full px-4 py-2 mb-4 bg-blue-500 text-white rounded disabled:bg-gray-300"
               onClick={handleRoll}
@@ -258,26 +256,25 @@ const YutnoriGame = ({gameType, playerCount}) => {
             >
               윷 던지기
             </button>
-            
+
             {currentRoll !== null && (
-              <div className="mb-4" style={{alignItems: 'center'}}>
+              <div className="mb-4" style={{ alignItems: 'center' }}>
                 {/* {toYut(currentRoll)} */}
-                {currentRoll == 0?'낙':''}
+                {currentRoll == 0 ? '낙' : ''}
               </div>
             )}
-            
+
             <div className="mb-4">
-              {rollResults?.[0]?'윷 결과: ':''}{rollResults.map(toYut).join(', ')}<br />
-              {rollResults?.[0]?'▼ 말을 선택하세요':''}
+              {rollResults?.[0] ? '윷 결과: ' : ''}{rollResults.map(toYut).join(', ')}<br />
+              {rollResults?.[0] ? '▼ 말을 선택하세요' : ''}
             </div>
-            
+
             <div className="grid grid-cols-2 gap-2">
               {game?.users[game.turn].pieces.map((piece, idx) => (
                 <button
                   key={idx}
-                  className={`p-2 border rounded ${
-                    selectedPiece === idx ? 'bg-blue-100' : ''
-                  }`}
+                  className={`p-2 border rounded ${selectedPiece === idx ? 'bg-blue-100' : ''
+                    }`}
                   onClick={() => handlePieceSelect(idx)}
                   disabled={piece === -1}
                 >
